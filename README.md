@@ -1,6 +1,8 @@
 # GenreFromAudio
 A pipeline to build a dataset from your own music library and use it to fill the missing genres
 
+Read the [article on Medium](https://medium.com/@juliendespois/finding-the-genre-of-a-song-with-deep-learning-da8f59a61194#.yhemoyql0)
+
 Required install:
 
 ```
