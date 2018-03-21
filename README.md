@@ -33,7 +33,21 @@ To test the classifier (fast):
 python main.py test
 ```
 
+- Create folder Input/Raw/
+- Place your unlabeled .mp3 files in Input/Raw/
+
+To create song slices of song to predict:
+
+```
+python main.py sliceInput
+```
+
+To predict the classifier's output:
+
+```
+python main.py predict
+```
 - Most editable parameters are in the config.py file, the model can be changed in the model.py file.
-- I haven't implemented the pipeline to label new songs with the model, but that can be easily done with the provided functions, and eyed3 for the mp3 manipulation. Here's the full pipeline you would need to use.
+- Pipeline to label new songs with the model is given below
 
 ![alt tag](https://github.com/despoisj/DeepAudioClassification/blob/master/img/pipeline.png)

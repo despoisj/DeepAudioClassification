@@ -11,8 +11,8 @@ import numpy as np
 import pickle
 
 from imageFilesTools import getImageData
-from config import datasetPath
-from config import slicesPath
+from config import datasetPath, inputDatasetPath
+from config import slicesPath, slicesInputPath
 
 #Creates name of dataset from parameters
 def getDatasetName(nbPerGenre, sliceSize):
@@ -31,7 +31,23 @@ def getDataset(nbPerGenre, genres, sliceSize, validationRatio, testRatio, mode):
         print("[+] Using existing dataset")
     
     return loadDataset(nbPerGenre, genres, sliceSize, mode)
-        
+
+
+def getInputDataset(nbPerGenre, genres, sliceSize, validationRatio, testRatio, mode):
+    print("[+] Creating dataset with {} slices of size {} per genre... ⌛️".format(nbPerGenre, sliceSize))
+    createDatasetFromInputSlices(nbPerGenre, genres, sliceSize, validationRatio, testRatio)
+    return loadInputDataset(nbPerGenre, genres, sliceSize, mode)
+
+
+def loadInputDataset(nbPerGenre, genres, sliceSize, mode):
+    #Load existing
+    datasetName = getDatasetName(nbPerGenre, sliceSize)
+    print("[+] Loading input datasets... ")
+    train_X = pickle.load(open("{}train_X_{}.p".format(inputDatasetPath, datasetName), "rb"))
+    train_y = pickle.load(open("{}train_y_{}.p".format(inputDatasetPath, datasetName), "rb"))
+    print("    Input datasets loaded! ✅")
+    return train_X, train_y
+
 #Loads dataset
 #Mode = "train" or "test"
 def loadDataset(nbPerGenre, genres, sliceSize, mode):
@@ -74,6 +90,23 @@ def saveDataset(train_X, train_y, validation_X, validation_y, test_X, test_y, nb
     pickle.dump(test_y, open("{}test_y_{}.p".format(datasetPath,datasetName), "wb" ))
     print("    Dataset saved! ✅💾")
 
+
+def saveInputDataset(train_X, train_y, nbPerGenre, sliceSize):
+    # Create path for dataset if not existing
+    if not os.path.exists(os.path.dirname(inputDatasetPath)):
+        try:
+            os.makedirs(os.path.dirname(inputDatasetPath))
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+    # SaveDataset
+    print("[+] Saving dataset... ")
+    datasetName = getDatasetName(nbPerGenre, sliceSize)
+    pickle.dump(train_X, open("{}train_X_{}.p".format(inputDatasetPath, datasetName), "wb"))
+    pickle.dump(train_y, open("{}train_y_{}.p".format(inputDatasetPath, datasetName), "wb"))
+    print("    Dataset saved! ✅💾")
+
 #Creates and save dataset from slices
 def createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, testRatio):
     data = []
@@ -113,6 +146,43 @@ def createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, test
     print("    Dataset created! ✅")
         
     #Save
-    saveDataset(train_X, train_y, validation_X, validation_y, test_X, test_y, nbPerGenre, genres, sliceSize)
+    saveInputDataset(train_X, train_y, validation_X, validation_y, test_X, test_y, nbPerGenre, genres, sliceSize)
 
     return train_X, train_y, validation_X, validation_y, test_X, test_y
+
+
+def createDatasetFromInputSlices(nbPerGenre, genres, sliceSize, validationRatio, testRatio):
+    data = []
+    genre = "Test"
+    print("-> Adding {}...".format(genre))
+    # Get slices in genre subfolder
+    filenames = os.listdir(slicesInputPath + genre)
+    filenames = [filename for filename in filenames if filename.endswith('.png')]
+    filenames = filenames[:nbPerGenre]
+    # Randomize file selection for this genre
+    shuffle(filenames)
+
+    # Add data (X,y)
+    for filename in filenames:
+        imgData = getImageData(slicesInputPath + genre + "/" + filename, sliceSize)
+        label = 1.
+        data.append((imgData, label))
+
+    # Shuffle data
+    shuffle(data)
+
+    # Extract X and y
+    X, y = zip(*data)
+
+    # Split data
+    trainNb = len(X)
+
+    # Prepare for Tflearn at the same time
+    train_X = np.array(X[:trainNb]).reshape([-1, sliceSize, sliceSize, 1])
+    train_y = np.array(y[:trainNb])
+    print("    Dataset created! ✅")
+
+    # Save
+    saveInputDataset(train_X, train_y, nbPerGenre, sliceSize)
+
+    return train_X, train_y

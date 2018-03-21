@@ -4,9 +4,10 @@ import string
 import os
 import sys
 import numpy as np
+import operator
 
 from model import createModel
-from datasetTools import getDataset
+from datasetTools import getDataset, getInputDataset
 from config import slicesPath
 from config import batchSize
 from config import filesPerGenre
@@ -14,11 +15,11 @@ from config import nbEpoch
 from config import validationRatio, testRatio
 from config import sliceSize
 
-from songToData import createSlicesFromAudio
+from songToData import createSlicesFromAudio, createSlicesFromInputAudio
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("mode", help="Trains or tests the CNN", nargs='+', choices=["train","test","slice"])
+parser.add_argument("mode", help="Trains or tests the CNN", nargs='+', choices=["train","test","slice", "predict", "sliceInput"])
 args = parser.parse_args()
 
 print("--------------------------")
@@ -31,6 +32,10 @@ print("--------------------------")
 
 if "slice" in args.mode:
 	createSlicesFromAudio()
+	sys.exit()
+
+if "sliceInput" in args.mode:
+	createSlicesFromInputAudio()
 	sys.exit()
 
 #List genres
@@ -71,6 +76,27 @@ if "test" in args.mode:
 
 	testAccuracy = model.evaluate(test_X, test_y)[0]
 	print("[+] Test accuracy: {} ".format(testAccuracy))
+
+if "predict" in args.mode:
+	# Create or load new dataset
+	inp_X, inp_y = getInputDataset(filesPerGenre, genres, sliceSize, validationRatio, testRatio, mode="test")
+
+	model.load('musicDNN.tflearn')
+
+	countArray = [0,0,0,0,0,0,0,0,0,0]
+	genreCountDict = dict(zip(genres,countArray))
+
+	for i in range(len(inp_X)):
+		prediction = model.predict([inp_X[i]])
+		maxIndex, maxValue = max(enumerate(prediction[0]), key=operator.itemgetter(1))
+		tempValue = genreCountDict[genres[maxIndex]]
+		tempValue = tempValue + 1
+		genreCountDict[genres[maxIndex]] = tempValue
+
+	predictedGenre = max(genreCountDict.iteritems(), key=operator.itemgetter(1))[0]
+	print (genreCountDict)
+	print (predictedGenre)
+
 
 
 
