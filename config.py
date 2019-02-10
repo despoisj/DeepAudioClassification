@@ -9,9 +9,10 @@ pixelPerSecond = 50
 
 #Slice parameters
 sliceSize = 128
+sliceYSize = 256
 
 #Dataset parameters
-filesPerGenre = 1000
+filesPerGenre = 10000
 validationRatio = 0.3
 testRatio = 0.1
 

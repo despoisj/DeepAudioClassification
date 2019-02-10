@@ -38,7 +38,7 @@ genres = os.listdir(slicesPath)
 genres = [filename for filename in genres if os.path.isdir(slicesPath+filename)]
 nbClasses = len(genres)
 
-#Create model 
+#Create model
 model = createModel(nbClasses, sliceSize)
 
 if "train" in args.mode:
@@ -52,12 +52,12 @@ if "train" in args.mode:
 	#Train the model
 	print("[+] Training the model...")
 	model.fit(train_X, train_y, n_epoch=nbEpoch, batch_size=batchSize, shuffle=True, validation_set=(validation_X, validation_y), snapshot_step=100, show_metric=True, run_id=run_id)
-	print("    Model trained! ✅")
+	print("    Model trained!")
 
 	#Save trained model
 	print("[+] Saving the weights...")
 	model.save('musicDNN.tflearn')
-	print("[+] Weights saved! ✅💾")
+	print("[+] Weights saved!")
 
 if "test" in args.mode:
 
@@ -67,7 +67,7 @@ if "test" in args.mode:
 	#Load weights
 	print("[+] Loading weights...")
 	model.load('musicDNN.tflearn')
-	print("    Weights loaded! ✅")
+	print("    Weights loaded!")
 
 	testAccuracy = model.evaluate(test_X, test_y)[0]
 	print("[+] Test accuracy: {} ".format(testAccuracy))

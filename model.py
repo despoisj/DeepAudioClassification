@@ -30,5 +30,5 @@ def createModel(nbClasses,imageSize):
 	convnet = regression(convnet, optimizer='rmsprop', loss='categorical_crossentropy')
 
 	model = tflearn.DNN(convnet)
-	print("    Model created! ✅")
+	print("    Model created!")
 	return model

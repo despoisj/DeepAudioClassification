@@ -25,7 +25,7 @@ def getDatasetName(nbPerGenre, sliceSize):
 def getDataset(nbPerGenre, genres, sliceSize, validationRatio, testRatio, mode):
     print("[+] Dataset name: {}".format(getDatasetName(nbPerGenre,sliceSize)))
     if not os.path.isfile(datasetPath+"train_X_"+getDatasetName(nbPerGenre, sliceSize)+".p"):
-        print("[+] Creating dataset with {} slices of size {} per genre... ⌛️".format(nbPerGenre,sliceSize))
+        print("[+] Creating dataset with {} slices of size {} per genre...".format(nbPerGenre,sliceSize))
         createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, testRatio) 
     else:
         print("[+] Using existing dataset")
@@ -43,14 +43,14 @@ def loadDataset(nbPerGenre, genres, sliceSize, mode):
         train_y = pickle.load(open("{}train_y_{}.p".format(datasetPath,datasetName), "rb" ))
         validation_X = pickle.load(open("{}validation_X_{}.p".format(datasetPath,datasetName), "rb" ))
         validation_y = pickle.load(open("{}validation_y_{}.p".format(datasetPath,datasetName), "rb" ))
-        print("    Training and validation datasets loaded! ✅")
+        print("    Training and validation datasets loaded!")
         return train_X, train_y, validation_X, validation_y
 
     else:
         print("[+] Loading testing dataset... ")
         test_X = pickle.load(open("{}test_X_{}.p".format(datasetPath,datasetName), "rb" ))
         test_y = pickle.load(open("{}test_y_{}.p".format(datasetPath,datasetName), "rb" ))
-        print("    Testing dataset loaded! ✅")
+        print("    Testing dataset loaded!")
         return test_X, test_y
 
 #Saves dataset
@@ -72,7 +72,7 @@ def saveDataset(train_X, train_y, validation_X, validation_y, test_X, test_y, nb
     pickle.dump(validation_y, open("{}validation_y_{}.p".format(datasetPath,datasetName), "wb" ))
     pickle.dump(test_X, open("{}test_X_{}.p".format(datasetPath,datasetName), "wb" ))
     pickle.dump(test_y, open("{}test_y_{}.p".format(datasetPath,datasetName), "wb" ))
-    print("    Dataset saved! ✅💾")
+    print("    Dataset saved!")
 
 #Creates and save dataset from slices
 def createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, testRatio):
@@ -102,7 +102,9 @@ def createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, test
     validationNb = int(len(X)*validationRatio)
     testNb = int(len(X)*testRatio)
     trainNb = len(X)-(validationNb + testNb)
-
+    print("----------------")
+    print("Total dataset {}".format(len(X)))
+    print("Split up into Training: {};  Validation: {};  Test: {};".format(trainNb, validationNb, testNb))
     #Prepare for Tflearn at the same time
     train_X = np.array(X[:trainNb]).reshape([-1, sliceSize, sliceSize, 1])
     train_y = np.array(y[:trainNb])
@@ -110,7 +112,7 @@ def createDatasetFromSlices(nbPerGenre, genres, sliceSize, validationRatio, test
     validation_y = np.array(y[trainNb:trainNb+validationNb])
     test_X = np.array(X[-testNb:]).reshape([-1, sliceSize, sliceSize, 1])
     test_y = np.array(y[-testNb:])
-    print("    Dataset created! ✅")
+    print("    Dataset created!")
         
     #Save
     saveDataset(train_X, train_y, validation_X, validation_y, test_X, test_y, nbPerGenre, genres, sliceSize)
