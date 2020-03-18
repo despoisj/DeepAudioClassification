@@ -1,3 +1,4 @@
 eyed3
 sox
 tflearn
+tensorflow
