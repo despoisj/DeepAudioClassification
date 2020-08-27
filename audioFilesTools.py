@@ -12,9 +12,13 @@ def getGenre(filename):
 	audiofile = eyed3.load(filename)
 	#No genre
 	if not audiofile.tag.genre:
-		return None
+		return str(None)
 	else:
-		return audiofile.tag.genre.name.encode('utf-8')
+		genere = str(audiofile.tag.genre.name.encode('utf-8'))
+		genere = genere.replace('b\'', '')
+		genere = genere.replace('\'', '')
+		return genere
+
 
 
 

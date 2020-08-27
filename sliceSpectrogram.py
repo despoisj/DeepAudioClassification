@@ -34,7 +34,7 @@ def sliceSpectrogram(filename, desiredSize):
 
 	#For each sample
 	for i in range(nbSamples):
-		print "Creating slice: ", (i+1), "/", nbSamples, "for", filename
+		print ("Creating slice: ", (i+1), "/", nbSamples, "for", filename)
 		#Extract and save 128x128 sample
 		startPixel = i*desiredSize
 		imgTmp = img.crop((startPixel, 1, startPixel + desiredSize, desiredSize + 1))
